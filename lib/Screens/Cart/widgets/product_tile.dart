@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:ecommerce_app/Screens/Cart/bloc/cart_bloc.dart';
 
 import 'package:flutter/material.dart';
@@ -6,11 +8,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../model/cart_model/cart.dart';
 
 class ProductTile extends StatefulWidget {
-  ProductTile({Key? key, required this.cartItem, required this.totalPrice})
-      : super(key: key);
+  ProductTile({
+    Key? key,
+    required this.cartItem,
+  }) : super(key: key);
 
   final Cart cartItem;
-  final double totalPrice;
+  // final double totalPrice;
 
   @override
   _ProductTileState createState() => _ProductTileState();
@@ -73,11 +77,20 @@ class _ProductTileState extends State<ProductTile> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const Text(
-                        'Description',
-                        style: TextStyle(
+                       Text(
+                        widget.cartItem.product.subDescription,
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
+                        ),
+                        
+                      ),
+                      SizedBox(height: 10),
+                       Text(
+                        widget.cartItem.product.price.toString(),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -94,53 +107,69 @@ class _ProductTileState extends State<ProductTile> {
                         quantity = updatedCartItem.quantity;
                         print('quantity updated');
                       }
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        width: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.green,
-                                radius: 15,
-                                child: IconButton(
-                                  onPressed: () {
-                                    cartBloc.add(
-                                      DecreaseQuantityEvent(widget.cartItem.id),
-                                    );
-                                    print(quantity);
-                                  },
-                                  icon: const Icon(
-                                    Icons.remove,
-                                    size: 15,
+                      return Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            width: 100,
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.green,
+                                    radius: 15,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        cartBloc.add(
+                                          DecreaseQuantityEvent(
+                                              widget.cartItem.id),
+                                        );
+                                        print(quantity);
+                                      },
+                                      icon: const Icon(
+                                        Icons.remove,
+                                        size: 15,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Text('$quantity'),
-                              CircleAvatar(
-                                backgroundColor: Colors.green,
-                                radius: 15,
-                                child: IconButton(
-                                  onPressed: () {
-                                    cartBloc.add(
-                                      IncreaseQuantityEvent(widget.cartItem.id),
-                                    );
-                                    print(quantity);
-                                  },
-                                  icon: const Icon(
-                                    Icons.add,
-                                    size: 15,
+                                  Text('$quantity'),
+                                  CircleAvatar(
+                                    backgroundColor: Colors.green,
+                                    radius: 15,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        cartBloc.add(
+                                          IncreaseQuantityEvent(
+                                              widget.cartItem.id),
+                                        );
+                                        print(quantity);
+                                      },
+                                      icon: const Icon(
+                                        Icons.add,
+                                        size: 15,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          IconButton(
+                              onPressed: () {
+                                BlocProvider.of<CartBloc>(context).add(
+                                    DeleteProductEvent(widget.cartItem.id));
+                              },
+                              icon: Icon(
+                                Icons.delete_forever,
+                                color: Colors.red,
+                              ))
+                        ],
                       );
                     },
                   ),

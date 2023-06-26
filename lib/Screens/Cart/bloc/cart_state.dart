@@ -39,7 +39,20 @@ class AddProductToCartError extends CartState {
 
   AddProductToCartError(this.error);
 }
+class CartSnackbar extends CartState {
+  final String message;
 
+  const CartSnackbar(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+class ProductDeletedState extends CartState {
+  const ProductDeletedState();
+}
+class CartEmptyState extends CartState{
+
+}
 // abstract class CartState extends Equatable {
 //   const CartState();
 

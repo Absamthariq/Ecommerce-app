@@ -1,7 +1,13 @@
+import 'package:ecommerce_app/Screens/Cart/cart_page.dart';
+import 'package:ecommerce_app/Screens/DashBoard/bloc/dashboard_bloc.dart';
+import 'package:ecommerce_app/Screens/DashBoard/dash_board.dart';
 import 'package:ecommerce_app/model/cart_model/cart.dart';
 import 'package:ecommerce_app/repo/cart_repo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+
+import '../bloc/cart_bloc.dart';
 
 class ChceckOut extends StatefulWidget {
   const ChceckOut({Key? key, required this.totalPrice}) : super(key: key);
@@ -84,12 +90,31 @@ class _ChceckOutState extends State<ChceckOut> {
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     // Handle payment success
     print('Payment Success: Payment ID - ${response.paymentId}');
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+          builder: (context) => BlocProvider(
+                create: (context) => DashboardBloc(),
+                child: DashBoardPage(),
+              )),
+      (route) => false,
+    );
+    CartRepository().clearCart();
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => BlocProvider<CartBloc>(
+    //       create: (context) => CartBloc(cartRepository: CartRepository()),
+    //       child: const MyCartPage(),
+    //     ),
+    //   ),
+    // );
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     // Handle payment failure
     print(
         'Payment Error: Code - ${response.code}, Message - ${response.message}');
+        Navigator.pop(context);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {

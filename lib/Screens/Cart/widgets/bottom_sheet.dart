@@ -112,7 +112,7 @@ class _BottomSheetDetailState extends State<BottomSheetDetail> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DeliveryAddressPage(totalPrice: widget.totalPrice,
+                          builder: (context) => AddressForm(totalPrice: widget.totalPrice,
                             
                           ),
                         ),

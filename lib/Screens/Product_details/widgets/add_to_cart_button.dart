@@ -32,7 +32,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<CartBloc>(
-                    create: (context) => CartBloc(cartRepository: CartRepository()),
+                    create: (context) =>
+                        CartBloc(cartRepository: CartRepository()),
                     child: MyCartPage(),
                   ),
                 ),
@@ -58,17 +59,18 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           const SizedBox(width: 30),
           BlocBuilder<CartBloc, CartState>(
             builder: (context, state) {
+             
               return Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                  
-                      BlocProvider.of<CartBloc>(context).add(
-                        AddToCartEvent(widget.product, widget.prodcutId),
-                      );
-                      // BlocProvider.of<CartBloc>(context).add(
-                      //   FetchCartEvent(),
-                      // );
-                    
+                    BlocProvider.of<CartBloc>(context).add(
+                      AddToCartEvent(widget.product, widget.prodcutId),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Product added to cart'),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
@@ -99,4 +101,3 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 }
-

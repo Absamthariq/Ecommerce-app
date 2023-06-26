@@ -35,3 +35,20 @@ class AddToCartEvent extends CartEvent {
   @override
   List<Object> get props => [product, productId];
 }
+class ShowSnackbarEvent extends CartEvent {
+  final String message;
+
+  const ShowSnackbarEvent({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+class DeleteProductEvent extends CartEvent {
+  final String productId;
+
+  const DeleteProductEvent(this.productId);
+
+  @override
+  List<Object> get props => [productId];
+}
+class ClearCartEvent extends CartEvent {}

@@ -5,8 +5,6 @@ import 'package:ecommerce_app/repo/cart_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-
 class ProductDetail extends StatefulWidget {
   const ProductDetail({Key? key, required this.productId}) : super(key: key);
   final String productId;
@@ -14,9 +12,9 @@ class ProductDetail extends StatefulWidget {
   _ProductDetailState createState() => _ProductDetailState();
 }
 
-class _ProductDetailState extends State<ProductDetail>
-    with SingleTickerProviderStateMixin {
+class _ProductDetailState extends State<ProductDetail> with SingleTickerProviderStateMixin {
   late final ProductDetailBloc productDetailBloc;
+
   @override
   void initState() {
     super.initState();
@@ -32,14 +30,13 @@ class _ProductDetailState extends State<ProductDetail>
 
   @override
   Widget build(BuildContext context) {
-    // final Product product =
-    //     ProductRepository.getProductById(id: widget.productId);
-    return BlocBuilder<ProductDetailBloc, ProductDetailState>(
-        bloc: productDetailBloc,
+    return BlocProvider<ProductDetailBloc>(
+      create: (context) => productDetailBloc,
+      child: BlocBuilder<ProductDetailBloc, ProductDetailState>(
         builder: (context, state) {
           if (state is ProductDetailLoaded) {
             return Scaffold(
-              appBar: appBar(),
+              appBar: appBar(context),
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -73,14 +70,19 @@ class _ProductDetailState extends State<ProductDetail>
             // Initial/default state, show placeholder or empty state
             return Text('No product detail available');
           }
-        });
+        },
+      ),
+    );
   }
+}
+
+  
 
   Text productDescription({required String description}) {
     return Text(description);
   }
 
-  AppBar appBar() {
+  AppBar appBar(BuildContext context) {
     return AppBar(
       elevation: 0,
       centerTitle: true,
@@ -104,7 +106,6 @@ class _ProductDetailState extends State<ProductDetail>
       ),
     );
   }
-}
 
 
 class ProductTitleDetails extends StatelessWidget {
@@ -145,7 +146,6 @@ class ProductTitleDetails extends StatelessWidget {
     );
   }
 }
-
 
 class ProductImageWidget extends StatelessWidget {
   const ProductImageWidget({

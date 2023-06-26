@@ -13,23 +13,33 @@ class CartRepository {
     }
   }
 
-   Future<void> addToCart(
-      {required Product product, required String id}) async {
+  Future<void> addToCart({required Product product, required String id}) async {
     final box = await _getCartBox();
-    final cartItem = Cart(id: id, product: product, quantity: 1);
-    await box.add(cartItem);
+
+    final cartItems = box.values.cast<Cart>().toList();
+
+    final existingCartItemIndex = cartItems.indexWhere((item) => item.id == id);
+
+    if (existingCartItemIndex != -1) {
+      // If the product already exists, increase its quantity
+      final existingCartItem = cartItems[existingCartItemIndex];
+      existingCartItem.quantity++;
+    } else {
+      // If the product doesn't exist, add it as a new cart item
+      final cartItem = Cart(id: id, product: product, quantity: 1);
+      await box.add(cartItem);
+    }
+
     print('Item added to cart: ${product.title}');
   }
 
-  // void addToCart({required Product product, required String id}) {
-  //   if (_cartItems.containsKey(id)) {
-  //     _cartItems[id]!.quantity += 1;
-  //         print('Item added to cart: ${product.title}');
+  //  Future<void> addToCart(
+  //     {required Product product, required String id}) async {
+  //   final box = await _getCartBox();
 
-  //   } else {
-  //     _cartItems[id] = Cart(id: id, product: product, quantity: 1);
-  //       print('Item not added to cart: ${product.title}');
-  //   }
+  //   final cartItem = Cart(id: id, product: product, quantity: 1);
+  //   await box.add(cartItem);
+  //   print('Item added to cart: ${product.title}');
   // }
 
   Future<void> updateCartItem(Cart updatedCartItem) async {
@@ -37,15 +47,13 @@ class CartRepository {
     await box.put(updatedCartItem.id, updatedCartItem);
   }
 
-
-Future<void> removeItem(String id) async {
-  final box = await _getCartBox();
-  final cartItem = box.values.firstWhere((cart) => cart.id == id);
-  if (cartItem != null) {
-    await cartItem.delete();
+  Future<void> removeItem(String id) async {
+    final box = await _getCartBox();
+    final cartItem = box.values.firstWhere((cart) => cart.id == id);
+    if (cartItem != null) {
+      await cartItem.delete();
+    }
   }
-}
-
 
   // Future<void> removeItem(String id) async {
   //   final box = await _getCartBox();
@@ -55,7 +63,7 @@ Future<void> removeItem(String id) async {
   //   }
   // }
 
-   List<Cart> getCartItems() {
+  List<Cart> getCartItems() {
     final box = Hive.box<Cart>(_cartBoxName);
     return box.values.toList();
   }
@@ -69,6 +77,16 @@ Future<void> removeItem(String id) async {
   double calculateTotalPrice() {
     final cartItems = getCartItems();
 
+    double totalPrice = 0;
+
+    for (var cartItem in cartItems) {
+      totalPrice += cartItem.product.price * cartItem.quantity;
+    }
+
+    return totalPrice;
+  }
+
+  double calculateTotalPriceForCartItems(List<Cart> cartItems) {
     double totalPrice = 0;
 
     for (var cartItem in cartItems) {
@@ -115,7 +133,14 @@ Future<void> removeItem(String id) async {
     final box = Hive.box<Cart>(_cartBoxName);
     return box.length;
   }
+Future<void> deleteProductById(String id)async{
+  final box = await _getCartBox();
+  final cartIndex = box.values.toList().indexWhere((cart) => cart.id == id);
+   await box.deleteAt(cartIndex);
 }
+}
+  
+
 
   // static Future<void> increaseQuantity(String id) async {
   //   final box = await _getCartBox();

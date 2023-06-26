@@ -24,12 +24,14 @@ class MyCartPage extends StatelessWidget {
           final List<Cart> cartItems = state.cartItems;
 
           final cartRepository = CartRepository();
-          final double totalPrice = cartRepository.calculateTotalPrice();
+          final double totalPrice =
+              cartRepository.calculateTotalPriceForCartItems(cartItems);
+          // final double totalPrice = calculateTotalPrice(cartItems);
 
           if (cartItems.isEmpty) {
             return Scaffold(
               backgroundColor: const Color.fromARGB(240, 247, 247, 247),
-              appBar: appBar(context),
+              appBar: appBar(context, cartBloc),
               body: const Center(
                 child: Text('Try Adding some products :)'),
               ),
@@ -37,7 +39,7 @@ class MyCartPage extends StatelessWidget {
           }
           return Scaffold(
               backgroundColor: const Color.fromARGB(240, 247, 247, 247),
-              appBar: appBar(context),
+              appBar: appBar(context, cartBloc),
               body: Column(
                 children: [
                   Expanded(
@@ -47,7 +49,6 @@ class MyCartPage extends StatelessWidget {
                         final cartItem = cartItems[index];
                         return ProductTile(
                           cartItem: cartItem,
-                          totalPrice: totalPrice,
                         );
                       },
                     ),
@@ -66,48 +67,83 @@ class MyCartPage extends StatelessWidget {
     );
   }
 
-  AppBar appBar(BuildContext context) {
+ AppBar appBar(BuildContext context, CartBloc cartBloc) {
     return AppBar(
       backgroundColor: const Color(0xFFFFFFFF),
       elevation: 0,
       centerTitle: true,
       title: const Text(
         'Cart Details',
-        style:
-            const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
       ),
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: CircleAvatar(
           backgroundColor: const Color(0xFFf2f2f2),
           child: IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                          create: (context) => DashboardBloc(),
-                          child: DashBoardPage()),
-                    ));
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.green,
-              )),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => DashboardBloc(),
+                    child: DashBoardPage(),
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.green,
+            ),
+          ),
         ),
       ),
       actions: [
         CircleAvatar(
           backgroundColor: const Color(0xFFf2f2f2),
           child: IconButton(
-              onPressed: () async {
-                final cartRepository = CartRepository();
-                cartRepository.clearCart();
-              },
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.green,
-              )),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Confirm Delete'),
+                    content: Text(
+                      'Are you sure you want to delete all items from the cart?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          cartBloc.add(ClearCartEvent());
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Cart cleared'),
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Delete'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.green,
+            ),
+          ),
         ),
       ],
     );
